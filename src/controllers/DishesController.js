@@ -1,13 +1,14 @@
-const { request, response } = require("express")
+const AppError = require("../utils/AppError")
 const knex = require("../database/knex")
+const DiskStorage = require("../providers/DiskStorage")
 
 class DishesController{
     async create(request , response){
         const {title ,price , category, description , ingredients  } = request.body
-        const {user_id} = request.params
+        const user_id = request.user.id
 
         const [dish_id] = await knex("dishes").insert({
-            
+            image,
             title,
             price,
             category,
@@ -51,7 +52,8 @@ class DishesController{
     }
 
     async index(request , response){
-        const {title ,user_id, ingredients} = request.query
+        const {title , ingredients} = request.query
+        const user_id = request.user.id
 
         let dishes
 
@@ -88,6 +90,50 @@ class DishesController{
 
         return response.json(dishesWithIngredients)
     }
+
+    async update (request , response){
+        const { title, price, category, description, ingredients } = request.body
+        const {id} = request.params
+        
+        const imageFileName = request.file.filename;
+        
+        
+        const diskStorage = new DiskStorage()
+
+        
+        
+        const dish = await knex("dishes").where({id}).first()
+        
+        
+        
+        
+        if(!dish){
+            throw new AppError("Prato não encontrado.",401)
+        }
+        
+        if(dish.image){
+            await diskStorage.deleteFile(dish.image)
+        }
+        
+        const filename = await diskStorage.saveFile(imageFileName)
+        dish.image = filename
+
+        await knex("dishes").where({id}).update({
+            image:dish.image,
+            title:dish.title,
+            price:dish.price,
+            category: dish.category,
+            description: dish.description,
+            updated_at:new Date()
+
+
+        })
+
+        return response.json({
+            ...dish
+        })
+    }
+
 }
 
 module.exports = DishesController
