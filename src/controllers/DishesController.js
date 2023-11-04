@@ -8,16 +8,16 @@ class DishesController{
 
         const user_id = request.user.id
 
-        // const imageFileName = request.file.filename
+        const imageFileName = request.file.filename
         
 
-        // const diskStorage = new DiskStorage()
+        const diskStorage = new DiskStorage()
 
-        // const filename = await diskStorage.saveFile(imageFileName)
+        const image = await diskStorage.saveFile(imageFileName)
            
 
         const [dish_id] = await knex("dishes").insert({
-            // image:filename,
+            image,
             title,
             price,
             category,
@@ -27,7 +27,7 @@ class DishesController{
             
         })
 
-        const ingredientsInsert = ingredients.map( name => {
+        const ingredientsInsert = JSON.parse(ingredients).map( name => {
             return{
                 name,
                 dish_id,
