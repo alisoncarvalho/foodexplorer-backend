@@ -22,10 +22,10 @@ class DishesController{
             price,
             category,
             description,
-            
             user_id 
-            
         })
+            
+            
 
         const ingredientsInsert = JSON.parse(ingredients).map( name => {
             return{
@@ -39,6 +39,7 @@ class DishesController{
         await knex("ingredients").insert(ingredientsInsert)
 
         return response.json()
+
     }
 
     async show(request , response){
