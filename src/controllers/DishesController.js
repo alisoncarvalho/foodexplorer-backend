@@ -34,6 +34,8 @@ class DishesController{
                 user_id
 
             }
+
+            
         })
 
         await knex("ingredients").insert(ingredientsInsert)
