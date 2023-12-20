@@ -20,7 +20,7 @@ dishesRoutes.post("/" , verifyUserAuthorization("admin"),upload.single("image") 
 dishesRoutes.get("/:id" , dishesController.show)
 dishesRoutes.delete("/:id" , verifyUserAuthorization("admin"), dishesController.delete)
 dishesRoutes.get("/" , dishesController.index)
-dishesRoutes.patch("/:id", verifyUserAuthorization("admin"), upload.single("image"), dishesController.update)
+dishesRoutes.put("/:id", verifyUserAuthorization("admin"), upload.single("image"), dishesController.update)
 
 
 module.exports = dishesRoutes

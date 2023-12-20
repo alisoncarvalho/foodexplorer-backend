@@ -44,6 +44,61 @@ class DishesController{
 
     }
 
+    async update (request , response){
+        const { image ,title, price, category, description, ingredients } = request.body
+        const {id} = request.params
+        
+        const imageFileName = request.file.filename;
+
+        const user_id = request.user.id
+        
+        
+        const diskStorage = new DiskStorage()
+
+        
+        const dish = await knex("dishes").where({id}).first()
+        
+        if(dish.image){
+            await diskStorage.deleteFile(dish.image)
+        }
+        
+        const filename = await diskStorage.saveFile(imageFileName)
+        
+
+
+        dish.image = image ?? filename;
+        dish.title = title ?? dish.title;
+        dish.description = description ?? dish.description;
+        dish.category = category ?? dish.category;
+        dish.price = price ?? dish.price;
+        
+        
+        if(!dish){
+            throw new AppError("Prato não encontrado.",401)
+        }
+
+        await knex("dishes").where({id}).update(dish)
+        
+        const ingredientsInsert = JSON.parse(ingredients).map( name => {
+            return{
+                name,
+                dish_id: dish.id,
+                user_id
+
+            }
+
+            
+        })
+        await knex("ingredients").delete()
+        await knex("ingredients").insert(ingredientsInsert)
+
+        
+
+        return response.json({
+            ...dish
+        })
+    }   
+
     async show(request , response){
         const {id} = request.params
 
@@ -105,49 +160,8 @@ class DishesController{
 
         return response.json(dishesWithIngredients)
     }
-
-    async update (request , response){
-        const { title, price, category, description, ingredients } = request.body
-        const {id} = request.params
-        
-        const imageFileName = request.file.filename;
-        
-        
-        const diskStorage = new DiskStorage()
-
-        
-        
-        const dish = await knex("dishes").where({id}).first()
-        
-        
-        
-        
-        if(!dish){
-            throw new AppError("Prato não encontrado.",401)
-        }
-        
-        if(dish.image){
-            await diskStorage.deleteFile(dish.image)
-        }
-        
-        const filename = await diskStorage.saveFile(imageFileName)
-        dish.image = filename
-
-        await knex("dishes").where({id}).update({
-            image:dish.image,
-            title:dish.title,
-            price:dish.price,
-            category: dish.category,
-            description: dish.description,
-            updated_at:new Date()
-
-
-        })
-
-        return response.json({
-            ...dish
-        })
-    }
+    
+    
 
 }
 
