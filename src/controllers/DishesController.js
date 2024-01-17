@@ -57,20 +57,20 @@ class DishesController{
         
         const dish = await knex("dishes").where({id}).first()
         
-        // if(dish.image){
-        //     await diskStorage.deleteFile(dish.image)
-        // }
+        if(dish.image){
+            await diskStorage.deleteFile(dish.image)
+        }
         
 
-        if(request.file){
-            if(dish.image){
-                await diskStorage.deleteFile(dish.image)
-            }
-            const image = await diskStorage.saveFile(imageFileName)
-            dish.image = image
-        }
+        // if(request.file){
+        //     if(dish.image){
+        //         await diskStorage.deleteFile(dish.image)
+        //     }
+        //     const image = await diskStorage.saveFile(imageFileName)
+        //     dish.image = image
+        // }
 
-        // const filename = await diskStorage.saveFile(imageFileName)
+        const filename = await diskStorage.saveFile(imageFileName)
         
 
 
